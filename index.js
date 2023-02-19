@@ -1,3 +1,33 @@
+function handleMouseEnter(e, d) {
+    const classes = e.target.classList;
+    console.log(e.clientX, e.clientY);
+    console.log(d)
+
+    const tooltip = d3.select('#tooltip')
+    .attr('display', true)
+    .html(`<strong>Title: ${d.title}</strong><br>
+    Author(s): ${d.authors}<br>
+    Date Written: ${d.date.year_label}<br>
+    Number of Translationed Languages: ${d.num_translations}<br>
+    Original Language(s): ${d.original_language}<br>
+`)
+    .style('top', `${e.clientY}px`)
+    .style('background', `white`)
+    .style('border-width', `2px`)
+    .style('border-style', `solid`)
+    .style('left', `${e.clientX}px`)
+    .style('position', `fixed`)
+    console.log(tooltip);    
+}
+
+function handleMouseLeave(e) {
+    console.log("test leaving")
+    d3.select('#tooltip')
+        .attr('display', false)
+        .style('border-width', `0px`)
+        .html('')
+}
+
 function parse_num_translated(string){
     if (isNaN(string)) {
         let num_as_strs = string.match(/([0-9]*(,[0-9]+)*)/g);
@@ -62,25 +92,34 @@ d3.csv("books_for_hackathon.csv", function(d){
     const rects = graph.selectAll("rect")
         .data(data)
 
-    const widthBand = d3.scaleBand()
-        .domain(data.map(d => d.title))
-        .range([0, graphWidth])
-        .paddingInner(0.2)
-        .paddingOuter(0.2);
+
+    // const tip = d3.tip()
+    // .attr('class', 'tip card')
+    // .html(d => {
+    //     return `<p>Hello there</p>`
+    // })
+
+    // graph.call(tip)
 
     rects.attr('width', 30)
     .attr("height", d => graphHeight - y(d.num_translations))
     .attr("fill", "steelblue")
     .attr('x', d => x(d.date.start_year) + 20)
+    .attr('y', d => y(d.num_translations))
+    .on('mouseenter', e => handleMouseEnter(e))
+    .on('mouseleave', e => handleMouseLeave(e))
 
     rects.enter()
-    .append('rect')
-   .attr('width', 30)
-    .attr("height", d => graphHeight - y(d.num_translations))
-    .attr("fill", "steelblue")
-    .attr('x', d => x(d.date.start_year) + 20)
-    .attr('y', d => y(d.num_translations))
-    .attr('class', d => d.date.year_label)
+        .append('rect')
+            .attr('width', 30)
+            .attr("height", d => graphHeight - y(d.num_translations))
+            .attr("fill", "steelblue")
+            .attr('x', d => x(d.date.start_year) + 20)
+            .attr('y', d => y(d.num_translations))
+            .attr('class', d => d.date.year_label)
+            .on('mouseenter', (e, d) => handleMouseEnter(e, d))
+            .on('mouseleave', e => handleMouseLeave(e))
+
 
     const xAxis = d3.axisBottom(x);
     const yAxis = d3.axisLeft(y);
