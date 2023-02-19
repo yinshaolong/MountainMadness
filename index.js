@@ -39,7 +39,9 @@ const graph = svg.append("g")
     .attr("width", graphWidth)
     .attr("height", graphHeight)
     .attr('transform', `translate(${margin.left},${margin.top})`);
-
+const xAxisGroup = graph.append("g")
+   .attr("transform", `translate(0,${graphHeight})`);
+const yAxisGroup = graph.append('g');
 
 d3.csv("books_for_hackathon.csv", function(d){
     return {
@@ -47,7 +49,7 @@ d3.csv("books_for_hackathon.csv", function(d){
     authors: d.Authors,
     date: parse_year_start(d.Date),
     num_translations: parse_num_translated(d['Number of Translations']),
-    original_langauge: d['Original Language']
+    original_language: d['Original Language']
 }}).then(data => {
     const y = d3.scaleLinear()
         .domain([0, d3.max(data, d => d.num_translations)])
@@ -80,5 +82,10 @@ d3.csv("books_for_hackathon.csv", function(d){
     .attr('y', d => y(d.num_translations))
     .attr('class', d => d.date.year_label)
 
+    const xAxis = d3.axisBottom(x);
+    const yAxis = d3.axisLeft(y);
+
+    xAxisGroup.call(xAxis);
+    yAxisGroup.call(yAxis);
     console.log(data)
 })
