@@ -1,15 +1,12 @@
 import requests
 from bs4 import BeautifulSoup
 
-# import unicodecsv as csv
 from csv import writer
 
-# from io import BytesIO
-
-# f = BytesIO()
-# w = csv.writer(f, encoding="utf-8")
-
-
+# books with most number of translations
+# language with most number of translations
+# interactive with start and end years
+# with slider for year
 def is_line_break(cell):
     return cell != "\n"
 
@@ -43,7 +40,7 @@ def get_book_list():
                     book["number_of_translations"] = cell.get_text()
                 # list of languages
                 elif i == 4:
-                    book["original_language"] = cell.get_text()
+                    book["original_language"] = cell.get_text().strip()
                 i += 1
             book_list.append(book)
 
@@ -57,7 +54,9 @@ soup = BeautifulSoup(response.text, "html.parser")
 data_table_rows = soup.select(".wikitable tr")
 book_dict_list = get_book_list()
 
-with open("books_for_hackathon.csv", encoding="utf-8", mode="w") as csv_file:
+with open(
+    "books_for_hackathon.csv", encoding="utf-8", mode="w", newline=""
+) as csv_file:
     csv_writer = writer(csv_file)
     csv_writer.writerow(
         ["Title", "Authors", "Date", "Number of Translations", "Original Language"]
@@ -73,4 +72,3 @@ with open("books_for_hackathon.csv", encoding="utf-8", mode="w") as csv_file:
                 book["original_language"],
             ]
         )
-# print(book_dict_list)
